@@ -1,0 +1,91 @@
+////
+export const getFilms= page=>axios.get(BASE_URL+ `?page=${page}&api_key=${key}`)
+
+
+//
+const getImages =
+  (searchQuery,
+  page)=>axios
+    .get(
+      `${BASE_URL}?q=${searchQuery}&page=${page}&key=${key}&image_type=photo&orientation=horizontal&per_page=12
+        `
+    )
+///
+useEffect(() => {
+
+        setIsLoading(true);
+        api.getFilms(page)
+            .then(({ data }) => {
+                setMovies(prevState => [...prevState, ...filterMovies(data.results)]);
+            })
+            .catch(error => console.log(error))
+            .finally(() => {
+                setIsLoading(false);
+                if (page > 1) {
+                    window.scrollTo({
+                        top: document.documentElement.scrollHeight,
+                        behavior: 'smooth',
+                    });
+                }
+            });
+    }, [page]);
+
+/////
+
+const filterMovies = movies =>
+  movies.map(({ id, title, backdrop_path: img, overview: text }) =>
+({
+  id, 
+  title,
+  img,
+  text,
+  isWatched: false,
+}));
+    
+//////
+   function filterImages(images) {
+    const Arr = images.map(({ id, webformatURL, user, largeImageURL }) => {
+      return { id, webformatURL, user, largeImageURL };
+    });
+    return Arr; 
+}
+  
+///// разобраться почему загружаются сразу ---через api.getImages
+
+
+ if (!searchQuery) {
+      return;
+    }
+
+useEffect(() => {
+
+      setIsLoading(true);
+      api.getImages(searchQuery,
+        page)
+        .then((data) =>
+          (data.length > 0)
+            ? setImages((prevState) => (
+              [...prevState,
+              ...filterImages(data),
+              ]
+            ),
+            )
+            : toast.warning(
+              'Image not found!!!',
+            ),
+        )
+        .catch(error =>
+          console.log(error),
+          //setError(error)
+        )
+        .finally(() => {
+          setIsLoading(false);
+
+          window.scrollTo({
+            top: document.documentElement
+              .scrollHeight,
+            behavior: 'smooth',
+          });
+        });
+    
+  }, [searchQuery, page]);
